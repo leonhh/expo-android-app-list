@@ -1,4 +1,4 @@
-package expo.modules.applist
+package expo.modules.androidapplist
 
 import android.content.pm.PackageManager
 import android.content.pm.PackageInfo
@@ -16,7 +16,7 @@ import kotlinx.coroutines.*
 import java.io.InputStreamReader
 import java.util.concurrent.ConcurrentHashMap
 
-import expo.modules.applist.models.PackageDetails
+import expo.modules.androidapplist.models.PackageDetails
 
 class PackageUtilities(
     private val packageManager: PackageManager,

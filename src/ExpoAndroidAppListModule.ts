@@ -1,12 +1,12 @@
-import { NativeModule, requireNativeModule } from "expo";
-import { AppListPackage } from "./ExpoAppList.types";
+import { NativeModule, requireNativeModule } from "expo-modules-core";
+import { AndroidAppListPackage } from "./ExpoAndroidAppList.types";
 
-declare class ExpoAppListModule extends NativeModule {
+declare class ExpoAndroidAppListModule extends NativeModule {
   /**
    * Gets a list of all installed apps
    * @returns An array of installed apps
    */
-  getAll(): Promise<AppListPackage[]>;
+  getAll(): Promise<AndroidAppListPackage[]>;
   /**
    * Gets the native libraries of an app
    * @param packageName The package name of the app
@@ -43,4 +43,4 @@ declare class ExpoAppListModule extends NativeModule {
   getPermissions(packageName: string): Promise<string[]>;
 }
 
-export default requireNativeModule<ExpoAppListModule>("ExpoAppList");
+export default requireNativeModule<ExpoAndroidAppListModule>("ExpoAndroidAppList");

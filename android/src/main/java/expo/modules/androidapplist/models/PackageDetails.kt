@@ -1,4 +1,4 @@
-package expo.modules.applist.models
+package expo.modules.androidapplist.models
 
 data class PackageDetails(
     val packageName: String,

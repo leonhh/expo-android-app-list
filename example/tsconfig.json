@@ -3,8 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "expo-app-list": ["../src/index"],
-      "expo-app-list/*": ["../src/*"]
+      "expo-android-app-list": ["../src/index"],
+      "expo-android-app-list/*": ["../src/*"]
     }
   }
 }

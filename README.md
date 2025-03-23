@@ -1,6 +1,6 @@
-# ExpoAppList
+# ExpoAndroidAppList
 
-expo-app-list is an Expo module that allows you to retrieve information about installed applications on Android devices.
+expo-android-app-list is an Expo module that allows you to retrieve information about installed applications on Android devices.
 
 ## Features
 
@@ -9,23 +9,23 @@ expo-app-list is an Expo module that allows you to retrieve information about in
 
 ## Installation
 
-```bash
-npx expo install expo-app-list
+```sh
+npx expo install expo-android-app-list
 ```
 
-## Android Permissions
+## Configuration
 
-This package requires the `QUERY_ALL_PACKAGES` permission to function. The permission is incluced in the code of `expo-app-list`.
+This package requires the `QUERY_ALL_PACKAGES` permission to function. The permission is included in the code of `expo-android-app-list`.
 
 ⚠️ **Important Note**: The `QUERY_ALL_PACKAGES` permission is considered sensitive. If you plan to publish your app on the Google Play Store, you may need to justify the use of this permission in your Google Play Store listing.
 
 ## Usage
 
-```javascript
-import { ExpoAppList } from 'expo-app-list';
+```typescript
+import { ExpoAndroidAppList } from 'expo-android-app-list';
 
-// Always call getAll() first before using other methods
-const apps = await ExpoAppList.getAll();
+// Get all installed apps
+const apps = await ExpoAndroidAppList.getAll();
 console.log(apps);
 ```
 
@@ -45,9 +45,9 @@ The `getAll()` method returns an array of objects containing information about e
 ]
 ```
 
-## ExpoAppList powers ReactRaptor
+## ExpoAndroidAppList powers ReactRaptor
 
-This package powers [ReactRaptor](https://play.google.com/store/apps/details?id=com.leonhh.reactraptor), an app for React Native developers that helps discover which Android apps are built with React Native. ReactRaptor uses ExpoAppList to scan installed applications and identify React Native-based apps.
+This package powers [ReactRaptor](https://play.google.com/store/apps/details?id=com.leonhh.reactraptor), an app for React Native developers that helps discover which Android apps are built with React Native. ReactRaptor uses ExpoAndroidAppList to scan installed applications and identify React Native-based apps.
 
 ## License
 

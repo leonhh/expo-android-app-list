@@ -6,12 +6,12 @@
   ],
   "apple": {
     "modules": [
-      "ExpoAppListModule"
+      "ExpoAndroidAppListModule"
     ]
   },
   "android": {
     "modules": [
-      "expo.modules.applist.ExpoAppListModule"
+      "expo.modules.androidapplist.ExpoAndroidAppListModule"
     ]
   }
 }

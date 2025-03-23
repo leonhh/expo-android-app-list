@@ -19,7 +19,7 @@ config.resolver.nodeModulesPaths = [
 ];
 
 config.resolver.extraNodeModules = {
-  'expo-app-list': '..',
+  'expo-android-app-list': '..',
 };
 
 config.watchFolders = [path.resolve(__dirname, '..')];

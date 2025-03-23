@@ -1,4 +1,4 @@
-export type AppListPackage = {
+export type AndroidAppListPackage = {
   packageName: string;
   versionName?: string;
   size: number;

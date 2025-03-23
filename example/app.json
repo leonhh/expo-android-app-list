@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-app-list-example",
-    "slug": "expo-app-list-example",
+    "name": "expo-android-app-list-example",
+    "slug": "expo-android-app-list-example",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "expo.modules.applist.example"
+      "bundleIdentifier": "expo.modules.androidapplist.example"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "expo.modules.applist.example"
+      "package": "expo.modules.androidapplist.example"
     },
     "web": {
       "favicon": "./assets/favicon.png"

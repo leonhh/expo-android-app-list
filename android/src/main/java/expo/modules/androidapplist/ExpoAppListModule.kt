@@ -1,4 +1,4 @@
-package expo.modules.applist
+package expo.modules.androidapplist
 
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.URL
 
-class ExpoAppListModule : Module() {
+class ExpoAndroidAppListModule : Module() {
     private var packageUtilities: PackageUtilities? = null
 
     private fun ensurePackageUtilities(promise: Promise): PackageUtilities? {
@@ -25,7 +25,7 @@ class ExpoAppListModule : Module() {
     }
 
     override fun definition() = ModuleDefinition {
-        Name("ExpoAppList")
+        Name("ExpoAndroidAppList")
 
         AsyncFunction("getAll") { promise: Promise ->
             try {

@@ -1,15 +1,15 @@
-import { AppListPackage, ExpoAppList } from "expo-app-list";
+import { AndroidAppListPackage, ExpoAndroidAppList } from "expo-android-app-list";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Button, SafeAreaView, ScrollView, View, Text } from "react-native";
 
 export default function App() {
-  const [packages, setPackages] = useState<AppListPackage[]>([]);
+  const [packages, setPackages] = useState<AndroidAppListPackage[]>([]);
   const [images, setImages] = useState<Map<string, string>>(new Map());
 
   const getAll = async () => {
     try {
-      const result = (await ExpoAppList.getAll()).filter(
+      const result = (await ExpoAndroidAppList.getAll()).filter(
         (pkg) => !pkg.isSystemApp,
       );
 
@@ -21,7 +21,7 @@ export default function App() {
 
   const getReactNativeApps = async () => {
     try {
-      const apps = await ExpoAppList.getAll();
+      const apps = await ExpoAndroidAppList.getAll();
 
       const result = [];
       const icons = new Map();
@@ -31,10 +31,10 @@ export default function App() {
           continue;
         }
 
-        const nativeLibraries = await ExpoAppList.getNativeLibraries(
+        const nativeLibraries = await ExpoAndroidAppList.getNativeLibraries(
           pkg.packageName,
         );
-        const icon = await ExpoAppList.getAppIcon(pkg.packageName);
+        const icon = await ExpoAndroidAppList.getAppIcon(pkg.packageName);
 
         if (
           nativeLibraries.includes("libreactnative.so") ||
@@ -54,7 +54,7 @@ export default function App() {
   };
 
   const getFileContent = async (packageName: string) => {
-    const result = await ExpoAppList.getFileContent(packageName, [
+    const result = await ExpoAndroidAppList.getFileContent(packageName, [
       "app.config.json",
       "app.config",
     ]);
@@ -63,7 +63,7 @@ export default function App() {
   };
 
   const getPermissions = async (packageName: string) => {
-    const result = await ExpoAppList.getPermissions(packageName);
+    const result = await ExpoAndroidAppList.getPermissions(packageName);
 
     console.log(result);
   };
