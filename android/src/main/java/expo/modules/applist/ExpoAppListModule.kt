@@ -1,50 +1,130 @@
 package expo.modules.applist
 
+import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.URL
 
 class ExpoAppListModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoAppList')` in JavaScript.
-    Name("ExpoAppList")
+    private var packageUtilities: PackageUtilities? = null
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
+    private fun ensurePackageUtilities(promise: Promise): PackageUtilities? {
+        if (packageUtilities != null) return packageUtilities
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+        val packageManager = appContext.reactContext?.packageManager
+        if (packageManager == null) {
+            promise.reject("ERROR", "PackageManager is null", null)
+            return null
+        }
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+        packageUtilities = PackageUtilities(packageManager)
+        return packageUtilities
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
-    }
+    override fun definition() = ModuleDefinition {
+        Name("ExpoAppList")
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoAppListView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: ExpoAppListView, url: URL ->
-        view.webView.loadUrl(url.toString())
-      }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
+        AsyncFunction("getAll") { promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val appList = utils.getAppList()
+                        val mappedResults: List<Map<String, Any>> = appList.mapNotNull { packageName ->
+                            utils.getPackageDetails(packageName)?.let { details ->
+                                mapOf(
+                                    "packageName" to details.packageName,
+                                    "versionName" to (details.versionName ?: ""),
+                                    "size" to details.size,
+                                    "appName" to details.appName,
+                                    "isSystemApp" to details.isSystemApp,
+                                    "firstInstallTime" to details.firstInstallTime,
+                                    "lastUpdateTime" to details.lastUpdateTime,
+                                    "targetSdkVersion" to details.targetSdkVersion
+                                )
+                            }
+                        }
+
+                        promise.resolve(mappedResults as List<Any?>)
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
+
+        AsyncFunction("getNativeLibraries") { packageName: String, promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val nativeLibraries = utils.getNativeLibraries(packageName)
+                        promise.resolve(nativeLibraries as List<Any?>)
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
+
+        AsyncFunction("getPermissions") { packageName: String, promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val permissions = utils.getPermissions(packageName)
+                        promise.resolve(permissions as List<Any?>)
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
+
+        AsyncFunction("getAppIcon") { packageName: String, promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val icon = utils.getAppIcon(packageName)
+                        promise.resolve(icon as String?)
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
+
+        AsyncFunction("getFileContent") { packageName: String, filenames: List<String>, promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val content = utils.getFileContent(packageName, filenames)
+                        promise.resolve(content)
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
     }
-  }
 }
