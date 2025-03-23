@@ -1,5 +1,5 @@
 import { AndroidAppListPackage, ExpoAndroidAppList } from "expo-android-app-list";
-import { Image } from "expo-image";
+import { Image, ImageSource } from "expo-image";
 import { useState } from "react";
 import { Button, SafeAreaView, ScrollView, View, Text } from "react-native";
 
@@ -85,9 +85,9 @@ export default function App() {
 
             <Image
               source={{
-                caheKey: pkg.packageName + 1,
+                cacheKey: pkg.packageName,
                 uri: `data:image/png;base64,${images.get(pkg.packageName)}`,
-              }}
+              } satisfies ImageSource}
               style={{ width: 100, height: 100 }}
             />
 

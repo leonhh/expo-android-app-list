@@ -21,15 +21,15 @@ This package requires the `QUERY_ALL_PACKAGES` permission to function. The permi
 
 ## Usage
 
-```typescript
-import { ExpoAndroidAppList } from 'expo-android-app-list';
-
-// Get all installed apps
-const apps = await ExpoAndroidAppList.getAll();
-console.log(apps);
-```
+### getAll
 
 The `getAll()` method returns an array of objects containing information about each installed application:
+
+```typescript
+import { ExpoAndroidAppList } from "expo-android-app-list";
+
+const apps = await ExpoAndroidAppList.getAll();
+```
 
 ```javascript
 [
@@ -39,10 +39,59 @@ The `getAll()` method returns an array of objects containing information about e
     versionName: "1.0.0",
     versionCode: 1,
     firstInstallTime: 1234567890,
-    lastUpdateTime: 1234567890
+    lastUpdateTime: 1234567890,
   },
   // ...
-]
+];
+```
+
+### getAppIcon
+
+To display app icons, you can use the `getAppIcon()` method along with expo-image. This methods is async because we need to convert a drawable to PNG.
+
+```typescript
+import { ExpoAndroidAppList } from 'expo-android-app-list';
+import { Image } from 'expo-image';
+
+const icon = await ExpoAndroidAppList.getAppIcon("com.example.app", 100);
+
+<Image
+  source={{
+    cacheKey: "com.example.app",
+    uri: `data:image/png;base64,${icon}`,
+  }}
+  style={{ width: 100, height: 100 }}
+/>
+```
+
+### getNativeLibraries
+
+The `getNativeLibraries()` method allows you to retrieve a list of native libraries (.so files) used by an Android application:
+
+```typescript
+const libraries =
+  await ExpoAndroidAppList.getNativeLibraries("com.example.app");
+```
+
+### getFileContent
+
+The `getFileContent()` method allows you to search for and read files which might be included in the APK:
+
+```typescript
+// Search for specific configuration files
+const configs = await ExpoAndroidAppList.getFileContent("com.example.app", [
+  "config.json",
+]);
+```
+
+### getPermissions
+
+The `getPermissions()` method retrieves all permissions that an app can request:
+
+```typescript
+const permissions = await ExpoAndroidAppList.getPermissions("com.example.app");
+
+const hasCameraPermission = permissions.includes("android.permission.CAMERA");
 ```
 
 ## ExpoAndroidAppList powers ReactRaptor
@@ -55,4 +104,4 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Feel free to submit a Pull Request. 
+Contributions are welcome! Feel free to submit a Pull Request.

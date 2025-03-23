@@ -11,4 +11,7 @@ export default {
   getFileContent: async (packageName: string, files: string[]) => {
     return "";
   },
+  getPermissions: async (packageName: string) => {
+    return [];
+  }
 };
