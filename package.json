@@ -1,6 +1,6 @@
 {
   "name": "expo-android-app-list",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Get a list of installed Android apps",
   "main": "build/index.js",
   "types": "build/index.d.ts",
