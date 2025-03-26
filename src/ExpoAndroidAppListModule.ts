@@ -41,6 +41,12 @@ declare class ExpoAndroidAppListModule extends NativeModule {
    * @returns An array of permissions, or null if no permissions
    */
   getPermissions(packageName: string): Promise<string[]>;
+  /**
+   * Gets detailed information about a specific package
+   * @param packageName The package name of the app
+   * @returns Detailed information about the package, or null if not found
+   */
+  getPackageDetails(packageName: string): Promise<AndroidAppListPackage | null>;
 }
 
 export default requireNativeModule<ExpoAndroidAppListModule>("ExpoAndroidAppList");

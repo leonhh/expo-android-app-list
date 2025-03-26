@@ -1,5 +1,5 @@
 export default {
-  getAllPackageDetails: async () => {
+  getAll: async () => {
     return [];
   },
   getNativeLibraries: async (packageName: string) => {
@@ -13,5 +13,8 @@ export default {
   },
   getPermissions: async (packageName: string) => {
     return [];
+  },
+  getPackageDetails: async (packageName: string) => {
+    return null;
   }
 };

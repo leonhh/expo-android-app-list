@@ -126,5 +126,35 @@ class ExpoAndroidAppListModule : Module() {
                 promise.reject("ERROR", e.message, e)
             }
         }
+
+        AsyncFunction("getPackageDetails") { packageName: String, promise: Promise ->
+            try {
+                val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    try {
+                        val details = utils.getPackageDetails(packageName)
+                        if (details != null) {
+                            promise.resolve(mapOf(
+                                "packageName" to details.packageName,
+                                "versionName" to (details.versionName ?: ""),
+                                "size" to details.size,
+                                "appName" to details.appName,
+                                "isSystemApp" to details.isSystemApp,
+                                "firstInstallTime" to details.firstInstallTime,
+                                "lastUpdateTime" to details.lastUpdateTime,
+                                "targetSdkVersion" to details.targetSdkVersion
+                            ))
+                        } else {
+                            promise.resolve(null)
+                        }
+                    } catch (e: Exception) {
+                        promise.reject("ERROR", e.message, e)
+                    }
+                }
+            } catch (e: Exception) {
+                promise.reject("ERROR", e.message, e)
+            }
+        }
     }
 }

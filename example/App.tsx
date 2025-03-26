@@ -1,11 +1,12 @@
 import { AndroidAppListPackage, ExpoAndroidAppList } from "expo-android-app-list";
 import { Image, ImageSource } from "expo-image";
 import { useState } from "react";
-import { Button, SafeAreaView, ScrollView, View, Text } from "react-native";
+import { Button, SafeAreaView, ScrollView, View, Text, StyleSheet } from "react-native";
 
 export default function App() {
   const [packages, setPackages] = useState<AndroidAppListPackage[]>([]);
   const [images, setImages] = useState<Map<string, string>>(new Map());
+  const [selectedPackage, setSelectedPackage] = useState<AndroidAppListPackage | null>(null);
 
   const getAll = async () => {
     try {
@@ -68,6 +69,17 @@ export default function App() {
     console.log(result);
   };
 
+  const getPackageDetails = async (packageName: string) => {
+    try {
+      const details = await ExpoAndroidAppList.getPackageDetails(packageName);
+      if (details) {
+        setSelectedPackage(details);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ padding: 16, gap: 5 }}>
@@ -76,6 +88,25 @@ export default function App() {
           onPress={getReactNativeApps}
           title="Get only react-native packages"
         />
+        <Button
+          onPress={() => getPackageDetails("expo.modules.androidapplist.example")}
+          title="Get example details"
+        />
+
+
+        {selectedPackage && (
+          <View style={styles.detailsContainer}>
+            <Text style={styles.detailsTitle}>Package Details</Text>
+            <Text style={styles.detailsText}>Name: {selectedPackage.appName}</Text>
+            <Text style={styles.detailsText}>Package: {selectedPackage.packageName}</Text>
+            <Text style={styles.detailsText}>Version: {selectedPackage.versionName}</Text>
+            <Text style={styles.detailsText}>Size: {(selectedPackage.size / 1024 / 1024).toFixed(2)} MB</Text>
+            <Text style={styles.detailsText}>First Install: {new Date(selectedPackage.firstInstallTime).toLocaleDateString()}</Text>
+            <Text style={styles.detailsText}>Last Update: {new Date(selectedPackage.lastUpdateTime).toLocaleDateString()}</Text>
+            <Text style={styles.detailsText}>Target SDK: {selectedPackage.targetSdkVersion}</Text>
+            <Button title="Close Details" onPress={() => setSelectedPackage(null)} />
+          </View>
+        )}
 
         {packages.map((pkg, index) => (
           <View style={styles.group} key={pkg.packageName}>
@@ -102,6 +133,11 @@ export default function App() {
               onPress={() => getPermissions(pkg.packageName)}
               title="Get permissions"
             />
+
+            <Button
+              onPress={() => getPackageDetails(pkg.packageName)}
+              title="View Details"
+            />
           </View>
         ))}
       </ScrollView>
@@ -109,15 +145,31 @@ export default function App() {
   );
 }
 
-const styles = {
-  group: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 12,
-    gap: 8,
-  },
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#eee",
   },
-};
+  group: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  detailsContainer: {
+    padding: 15,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  detailsTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  detailsText: {
+    fontSize: 16,
+    marginVertical: 3,
+  },
+});
