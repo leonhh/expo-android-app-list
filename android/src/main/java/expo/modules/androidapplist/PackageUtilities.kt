@@ -17,6 +17,7 @@ import java.io.InputStreamReader
 import java.util.concurrent.ConcurrentHashMap
 
 import expo.modules.androidapplist.models.PackageDetails
+import expo.modules.androidapplist.models.FileInfo
 
 class PackageUtilities(
     private val packageManager: PackageManager,
@@ -116,47 +117,49 @@ class PackageUtilities(
             }
         }
 
-    suspend fun getFileContent(packageName: String, filenames: List<String>): Map<String, String>? =
+    suspend fun getFiles(packageName: String, paths: List<String>): List<FileInfo?> =
         withContext(Dispatchers.IO) {
             try {
-                val packageInfo = getCachedPackageInfo(packageName) ?: return@withContext null
-                val appInfo = packageInfo.applicationInfo ?: return@withContext null
-                val results = mutableMapOf<String, String>()
+                val packageInfo = getCachedPackageInfo(packageName) ?: return@withContext paths.map { null }
+                val appInfo = packageInfo.applicationInfo ?: return@withContext paths.map { null }
+                val foundFiles = mutableMapOf<String, FileInfo>()
 
-                // Try to find files in the APK
                 ZipFile(appInfo.sourceDir).use { zip ->
                     zip.entries().asSequence()
-                        .filter { entry -> !entry.isDirectory && filenames.any { filename -> 
-                            entry.name.endsWith(filename) 
-                        }}
+                        .filter { entry -> !entry.isDirectory }
                         .forEach { entry ->
-                            try {
-                                zip.getInputStream(entry).use { input ->
-                                    val content = InputStreamReader(input).readText()
-                                    results[entry.name] = content
+                            val entryPath = entry.name
+                            paths.find { path -> entryPath == path || entryPath.endsWith("/$path") }?.let { matchedPath ->
+                                try {
+                                    zip.getInputStream(entry).use { input ->
+                                        val content = InputStreamReader(input).readText()
+                                        foundFiles[matchedPath] = FileInfo(content, entry.size)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to read file ${entry.name} from APK: ${e.message}")
                                 }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Failed to read file ${entry.name} from APK: ${e.message}")
                             }
                         }
                 }
 
-                // Also check split APKs if they exist
                 appInfo.splitSourceDirs?.forEach { splitSourceDir ->
                     try {
                         ZipFile(splitSourceDir).use { zip ->
                             zip.entries().asSequence()
-                                .filter { entry -> !entry.isDirectory && filenames.any { filename -> 
-                                    entry.name.endsWith(filename) 
-                                }}
+                                .filter { entry -> !entry.isDirectory }
                                 .forEach { entry ->
-                                    try {
-                                        zip.getInputStream(entry).use { input ->
-                                            val content = InputStreamReader(input).readText()
-                                            results[entry.name] = content
+                                    val entryPath = entry.name
+                                    paths.find { path -> entryPath == path || entryPath.endsWith("/$path") }?.let { matchedPath ->
+                                        if (!foundFiles.containsKey(matchedPath)) {
+                                            try {
+                                                zip.getInputStream(entry).use { input ->
+                                                    val content = InputStreamReader(input).readText()
+                                                    foundFiles[matchedPath] = FileInfo(content, entry.size)
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e(TAG, "Failed to read file ${entry.name} from split APK: ${e.message}")
+                                            }
                                         }
-                                    } catch (e: Exception) {
-                                        Log.e(TAG, "Failed to read file ${entry.name} from split APK: ${e.message}")
                                     }
                                 }
                         }
@@ -164,11 +167,10 @@ class PackageUtilities(
                         Log.e(TAG, "Failed to process split APK $splitSourceDir: ${e.message}")
                     }
                 }
-
-                if (results.isEmpty()) null else results
+                paths.map { path -> foundFiles[path] }
             } catch (e: Exception) {
-                Log.e(TAG, "Error getting file content for $packageName", e)
-                null
+                Log.e(TAG, "Error getting files for $packageName", e)
+                paths.map { null }
             }
         }
 

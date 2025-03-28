@@ -1,5 +1,5 @@
 import { NativeModule, requireNativeModule } from "expo-modules-core";
-import { AndroidAppListPackage } from "./ExpoAndroidAppList.types";
+import { AndroidAppListPackage, FileInfo } from "./ExpoAndroidAppList.types";
 
 declare class ExpoAndroidAppListModule extends NativeModule {
   /**
@@ -21,20 +21,20 @@ declare class ExpoAndroidAppListModule extends NativeModule {
    */
   getAppIcon(packageName: string, size?: number): Promise<string>;
   /**
-   * Reads the content of specified files from an app package
+   * Reads the content and size of specified files from an app package
    * @param packageName The package name of the app
-   * @param filenames Array of filenames to search for (e.g., ["app.config.json", "app.config"])
-   * @returns A map of file paths to their contents, or null if no files are found
+   * @param paths Array of file paths to search for
+   * @returns An array of file info objects in the same order as the input paths, with null for files that were not found
    * @example
    * // Search for app config files
-   * getFileContent("com.example.app", ["app.config.json", "app.config"])
-   * // Search for specific config files
-   * getFileContent("com.example.app", ["config.json", "settings.json"])
+   * getFiles("com.example.app", ["app.config.json", "app.config"])
+   * // Search for specific config files in assets directory
+   * getFiles("com.example.app", ["assets/config/settings.json"])
    */
-  getFileContent(
+  getFiles(
     packageName: string,
-    filenames: string[],
-  ): Promise<Record<string, string> | null>;
+    paths: string[],
+  ): Promise<(FileInfo | null)[]>;
   /**
    * Gets the permissions of an app
    * @param packageName The package name of the app
@@ -49,4 +49,4 @@ declare class ExpoAndroidAppListModule extends NativeModule {
   getPackageDetails(packageName: string): Promise<AndroidAppListPackage | null>;
 }
 
-export default requireNativeModule<ExpoAndroidAppListModule>("ExpoAndroidAppList");
+export default requireNativeModule("ExpoAndroidAppList") as ExpoAndroidAppListModule;

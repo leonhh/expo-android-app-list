@@ -8,8 +8,8 @@ export default {
   getAppIcon: async (packageName: string) => {
     return "";
   },
-  getFileContent: async (packageName: string, files: string[]) => {
-    return "";
+  getFiles: async (packageName: string, paths: string[]) => {
+    return [];
   },
   getPermissions: async (packageName: string) => {
     return [];

@@ -6,7 +6,6 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.net.URL
 
 class ExpoAndroidAppListModule : Module() {
     private var packageUtilities: PackageUtilities? = null
@@ -110,14 +109,21 @@ class ExpoAndroidAppListModule : Module() {
             }
         }
 
-        AsyncFunction("getFileContent") { packageName: String, filenames: List<String>, promise: Promise ->
+        AsyncFunction("getFiles") { packageName: String, paths: List<String>, promise: Promise ->
             try {
                 val utils = ensurePackageUtilities(promise) ?: return@AsyncFunction
 
                 CoroutineScope(Dispatchers.Default).launch {
                     try {
-                        val content = utils.getFileContent(packageName, filenames)
-                        promise.resolve(content)
+                        val files = utils.getFiles(packageName, paths)
+                        promise.resolve(files.map { file ->
+                            if (file == null) return@map null
+
+                            mapOf(
+                                "content" to file.content,
+                                "size" to file.size
+                            )
+                        })
                     } catch (e: Exception) {
                         promise.reject("ERROR", e.message, e)
                     }

@@ -55,7 +55,7 @@ export default function App() {
   };
 
   const getFileContent = async (packageName: string) => {
-    const result = await ExpoAndroidAppList.getFileContent(packageName, [
+    const result = await ExpoAndroidAppList.getFiles(packageName, [
       "app.config.json",
       "app.config",
     ]);

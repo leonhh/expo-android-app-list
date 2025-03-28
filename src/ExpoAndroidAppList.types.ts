@@ -9,3 +9,8 @@ export type AndroidAppListPackage = {
   lastUpdateTime: number;
   targetSdkVersion: number;
 };
+
+export type FileInfo = {
+  content: string;
+  size: number;
+}
